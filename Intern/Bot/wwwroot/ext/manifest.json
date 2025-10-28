@@ -1,0 +1,59 @@
+{
+    "manifest_version": 3,
+    "name": "Autobot Phái Sinh - v1.1",
+    "short_name": "Autobot Phái Sinh",
+    "version": "1.1",
+    "description": "Công cụ hỗ trợ giao dịch tự động kết nối thuật toán đến các công ty chứng khoán (VPS, VNDirect, ...)",
+    "author": "autobotps.com",
+    "update_url": "https://autobotps.com/ext/updates.xml",
+    "permissions": [
+        "declarativeNetRequestWithHostAccess",
+        "webNavigation",
+        "browsingData",
+        "tabs",
+        "activeTab",
+        "storage",
+        "unlimitedStorage",
+        "contextMenus"
+    ],
+    "action": {
+        "default_icon": {
+            "60": "images/autobotps-60.png"
+        }
+    },
+    "icons": {
+        "16": "images/autobotps-16.png",
+        "32": "images/autobotps-32.png",
+        "60": "images/autobotps-60.png",
+        "120": "images/autobotps-120.png"
+    },
+    "host_permissions": [
+        "http://*/*",
+        "https://*/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "/*.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://smartpro.vps.com.vn/*",
+                "https://smarteasy.vps.com.vn/*"
+            ],
+            "run_at": "document_start",
+            "js": [
+                "autobotps_loader.js"
+            ]
+        }
+    ]
+}

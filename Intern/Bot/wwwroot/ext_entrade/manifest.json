@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Autobot Entrade",
+  "short_name": "AutobotEntrade",
+  "version": "1.0",
+  "description": "Extension hỗ trợ Quick-Fill và hiển thị thông tin cho trading.entrade.com.vn",
+  "author": "Autobot Dev",
+  "permissions": [
+        "declarativeNetRequestWithHostAccess",
+        "webNavigation",
+        "browsingData",
+        "tabs",
+        "activeTab",
+        "storage",
+        "unlimitedStorage",
+        "contextMenus"
+  ],
+  "action": {
+        "default_icon": {
+            "60": "images/autobotps-60.png"
+        }
+    },
+    "icons": {
+        "16": "images/autobotps-16.png",
+        "32": "images/autobotps-32.png",
+        "60": "images/autobotps-60.png",
+        "120": "images/autobotps-120.png"
+    },
+    "host_permissions": [
+        "http://*/*",
+        "https://*/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "/*.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://trading.entrade.com.vn/*"
+            ],
+            "run_at": "document_start",
+            "js": [
+                "autobotps_loader.js"
+            ]
+        }
+    ]
+}

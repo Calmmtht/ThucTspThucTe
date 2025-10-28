@@ -1,0 +1,57 @@
+﻿# ============================
+# 🧱 Bo qua file nang hoac khong can thiet
+# ============================
+
+# Cac dinh dang file nen lon
+*.rar
+*.zip
+*.7z
+*.tar
+*.gz
+*.bz2
+
+# Docker & tar file
+file tar docker/
+docker/
+*.img
+*.iso
+
+# Thu muc tam, build, logs
+temp/
+tmp/
+logs/
+*.log
+
+# Node.js / npm
+node_modules/
+
+# Visual Studio / .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Unity / Unreal / Game engines
+Library/
+Temp/
+Build/
+Builds/
+Logs/
+*.unitypackage
+
+# Python
+__pycache__/
+*.pyc
+
+# System / OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Git LFS large files
+*.psd
+*.mp4
+*.mov
+*.avi
+*.mkv

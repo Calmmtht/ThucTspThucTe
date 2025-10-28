@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  adminbot:
+    build:
+      context: ./AdminBot
+      dockerfile: Dockerfile
+    container_name: adminbot
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+  frontend_autobot:
+    build:
+      context: ./Frontend_Autobot
+      dockerfile: Dockerfile
+    container_name: frontend_autobot
+    ports:
+      - "3001:80"
+    restart: unless-stopped
+
+  intern:
+    build:
+      context: ./Intern
+      dockerfile: Dockerfile
+    container_name: intern
+    ports:
+      - "5131:8080"
+    restart: unless-stopped
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Khai2782003
+      MYSQL_DATABASE: TradeBotApi
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
