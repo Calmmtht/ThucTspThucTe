@@ -111,13 +111,13 @@ const showTinHieu = (tinhieu) => {
                             <td class="text-left">
                                 <em><span class="date">${date}</span></em>
                             </td>
-                            <td class="text-left">
+                            <td class="text-left" style="text-align: center;">
                                 <b><span class="time">${time}</span></b>
                             </td>
-                            <td class="signal text-center ${signal.toLowerCase()}">
+                            <td class="signal text-center ${signal.toLowerCase()}" style="text-align: center;">
                                 <span class="signal">${signal.toUpperCase()}</span>
                             </td>
-                            <td class="text-right">
+                            <td class="text-right" style="text-align: center;">
                                 <span class="price" text-center="">${price}</span>
                             </td>
                         </tr>`;
@@ -1330,7 +1330,7 @@ window.addEventListener('load', async () => {
 
                         try {
                             const main = document.querySelector('main');
-                            const nodeGiaKhop = main.querySelectorAll("p")[2];
+                            nodeGiaKhop = main.querySelectorAll("p")[2];
 
                             if (!nodeGiaKhop) {
                                 console.warn("⚠️ Không tìm thấy node giá khớp, thu lai sau 1s...");
@@ -1348,44 +1348,138 @@ window.addEventListener('load', async () => {
                         }
 
                         // 🟢 Tạo observer theo dõi thay đổi giá
+                        // const obsNangTP = new MutationObserver(mutationsList => {
+                        //     for (let mutation of mutationsList) {
+                        //         if (mutation.type === 'characterData' || mutation.type === 'childList') {
+                        //             const textGia = nodeGiaKhop.textContent.trim();
+                        //             const giaKhopLenh = parseStrToFloat(textGia);
+
+                        //             if (isNaN(giaKhopLenh)) {
+                        //                 console.log("⚠️ Giá khớp không hợp lệ, bỏ qua...");
+                        //                 continue;
+                        //             }
+
+                        //             console.log("💹 Giá khớp mới:", giaKhopLenh);
+
+                        //             // === PHẦN XỬ LÝ TP1, TP2, CAT LO ===
+                        //             const isShort = tinhieu === "SHORT";
+
+                        //             const condition1 = isShort
+                        //                 ? giaKhopLenh <= tp1 && giaKhopLenh > tp2
+                        //                 : giaKhopLenh >= tp1 && giaKhopLenh < tp2;
+
+                        //             const condition2 = isShort
+                        //                 ? giaKhopLenh <= tp2
+                        //                 : giaKhopLenh >= tp2;
+
+                        //             const shdTP1 = my_hd - parseInt(order50[0]);
+                        //             const shdTP2 = my_hd - parseInt(order50[0]) - parseInt(order25[0]);
+
+                        //             // --- TP1 ---
+                        //             console.log(condition1)
+                        //             console.log(dadatTp1)
+                        //             console.log(shdTP1)
+
+                        //             console.log(condition2)
+                        //             console.log(dadatTp2)
+                        //             console.log(shdTP2)
+
+                        //             if (condition1 && !dadatTp1 && shdTP1 > 0) {
+                        //                 console.log("🎯 Kích hoạt TP1");
+                        //                 huyLenhDieuKien();
+                        //                 add_logs("Hủy lệnh sau khi chốt TP1");
+
+                        //                 const handler = () => runBotStopOrder(tinHieuDao, shdTP1, giamua);
+                        //                 (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
+
+                        //                 dadatTp1 = true;
+                        //                 localStorage.setItem("lastTP", JSON.stringify({
+                        //                     level: "TP1", time: new Date().toISOString(), price: tp1, contracts: shdTP1
+                        //                 }));
+                        //                 logHistory(userId, tinhieu, giamua, tp1, shdTP1, false);
+                        //                 giabandau = tp1;
+                        //             }
+
+
+                        //             // --- TP2 ---
+                        //             else if (condition2 && !dadatTp2 && shdTP2 > 0) {
+                        //                 console.log("🎯 Kích hoạt TP2");
+                        //                 huyLenhDieuKien();
+                        //                 add_logs("Hủy lệnh sau khi chốt TP2");
+
+                        //                 const handler = () => runBotStopOrder(tinHieuDao, shdTP2, tp1);
+                        //                 (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
+
+                        //                 dadatTp1 = true;
+                        //                 dadatTp2 = true;
+                        //                 localStorage.setItem("lastTP", JSON.stringify({
+                        //                     level: "TP2", time: new Date().toISOString(), price: tp2, contracts: shdTP2
+                        //                 }));
+                        //                 logHistory(userId, tinhieu, tp1, tp2, shdTP2, false);
+                        //                 giabandau = tp2;
+                        //             }
+
+                        //             // --- CAT LO ---
+                        //             const initCancelCondition = isShort
+                        //                 ? giaKhopLenh >= catLo && !dadatTp1 && !dadatTp2
+                        //                 : giaKhopLenh <= catLo && !dadatTp1 && !dadatTp2;
+
+                        //             const tp1Condition = isShort
+                        //                 ? giaKhopLenh >= giamua && dadatTp1 && !dadatTp2
+                        //                 : giaKhopLenh <= giamua && dadatTp1 && !dadatTp2;
+
+                        //             if (initCancelCondition && !daHuyInitCancel) {
+                        //                 console.log("❌ Hủy lệnh do đạt cắt lỗ");
+                        //                 huyLenhThuong();
+                        //                 add_logs("Hủy lệnh sau khi cắt lỗ");
+                        //                 daHuyInitCancel = true;
+                        //                 logHistory(userId, tinhieu, giamua, catLo, my_hd, true);
+                        //             } else if (tp1Condition && !daHuyTp1Cancel) {
+                        //                 console.log("❌ Hủy lệnh sau TP1 nhưng giá quay lại điểm vào");
+                        //                 huyLenhThuong();
+                        //                 add_logs("Hủy lệnh sau khi quay về TP1");
+                        //                 daHuyInitCancel = true;
+                        //                 daHuyTp1Cancel = true;
+                        //                 logHistory(userId, tinhieu, giamua, tp1, shdTP1, true);
+                        //             }
+                        //         }
+                        //     }
+                        // });
+
+                        let giaKhopTruoc = null; // 💡 thêm biến nhớ giá trước
+
                         const obsNangTP = new MutationObserver(mutationsList => {
                             for (let mutation of mutationsList) {
                                 if (mutation.type === 'characterData' || mutation.type === 'childList') {
                                     const textGia = nodeGiaKhop.textContent.trim();
                                     const giaKhopLenh = parseStrToFloat(textGia);
 
-                                    if (isNaN(giaKhopLenh)) {
-                                        console.log("⚠️ Giá khớp không hợp lệ, bỏ qua...");
+                                    if (isNaN(giaKhopLenh)) continue;
+
+                                    if (giaKhopTruoc === null) {
+                                        giaKhopTruoc = giaKhopLenh;
                                         continue;
                                     }
 
-                                    console.log("💹 Giá khớp mới:", giaKhopLenh);
-
-                                    // === PHẦN XỬ LÝ TP1, TP2, CAT LO ===
                                     const isShort = tinhieu === "SHORT";
 
-                                    const condition1 = isShort
-                                        ? giaKhopLenh <= tp1 && giaKhopLenh > tp2
-                                        : giaKhopLenh >= tp1 && giaKhopLenh < tp2;
+                                    // --- PHÁT HIỆN GIÁ VƯỢT QUA MỐC TP ---
+                                    const daVuotTP1 = isShort
+                                        ? giaKhopTruoc > tp1 && giaKhopLenh <= tp1   // SHORT: giá giảm qua TP1
+                                        : giaKhopTruoc < tp1 && giaKhopLenh >= tp1;  // LONG: giá tăng qua TP1
 
-                                    const condition2 = isShort
-                                        ? giaKhopLenh <= tp2
-                                        : giaKhopLenh >= tp2;
+                                    const daVuotTP2 = isShort
+                                        ? giaKhopTruoc > tp2 && giaKhopLenh <= tp2
+                                        : giaKhopTruoc < tp2 && giaKhopLenh >= tp2;
 
                                     const shdTP1 = my_hd - parseInt(order50[0]);
                                     const shdTP2 = my_hd - parseInt(order50[0]) - parseInt(order25[0]);
 
                                     // --- TP1 ---
-                                    console.log(condition1)
-                                    console.log(dadatTp1)
-                                    console.log(shdTP1)
+                                    if ((daVuotTP1 || (isShort ? giaKhopLenh <= tp1 : giaKhopLenh >= tp1))
+                                        && !dadatTp1 && shdTP1 > 0) {
 
-                                    console.log(condition2)
-                                    console.log(dadatTp2)
-                                    console.log(shdTP2)
-
-                                    if (condition1 && !dadatTp1 && shdTP1 > 0) {
-                                        console.log("🎯 Kích hoạt TP1");
+                                        console.log("🎯 Kích hoạt TP1 (vượt qua mốc)");
                                         huyLenhDieuKien();
                                         add_logs("Hủy lệnh sau khi chốt TP1");
 
@@ -1400,10 +1494,11 @@ window.addEventListener('load', async () => {
                                         giabandau = tp1;
                                     }
 
-
                                     // --- TP2 ---
-                                    else if (condition2 && !dadatTp2 && shdTP2 > 0) {
-                                        console.log("🎯 Kích hoạt TP2");
+                                    if ((daVuotTP2 || (isShort ? giaKhopLenh <= tp2 : giaKhopLenh >= tp2))
+                                        && !dadatTp2 && shdTP2 > 0) {
+
+                                        console.log("🎯 Kích hoạt TP2 (vượt qua mốc)");
                                         huyLenhDieuKien();
                                         add_logs("Hủy lệnh sau khi chốt TP2");
 
@@ -1419,7 +1514,7 @@ window.addEventListener('load', async () => {
                                         giabandau = tp2;
                                     }
 
-                                    // --- CAT LO ---
+                                    // --- CAT LO / QUAY VE TP1 ---
                                     const initCancelCondition = isShort
                                         ? giaKhopLenh >= catLo && !dadatTp1 && !dadatTp2
                                         : giaKhopLenh <= catLo && !dadatTp1 && !dadatTp2;
@@ -1442,9 +1537,12 @@ window.addEventListener('load', async () => {
                                         daHuyTp1Cancel = true;
                                         logHistory(userId, tinhieu, giamua, tp1, shdTP1, true);
                                     }
+
+                                    giaKhopTruoc = giaKhopLenh; // 🔄 cập nhật giá trước
                                 }
                             }
                         });
+
 
                         // bắt đầu theo dõi
                         obsNangTP.observe(nodeGiaKhop, { childList: true, characterData: true, subtree: true });
@@ -1591,7 +1689,7 @@ window.addEventListener('load', async () => {
                         hopdong = hd;
                     }
                     if (type[0] === "NO_STOP_ORDER" || type[1] === "NO_STOP_ORDER") {
-                        const tinhieu = arr[1].toUpperCase() === "TIN HIEU LONG: MANH" ? "LONG" : "SHORT";
+                        const tinhieu = arr[1].toUpperCase() === "TIN HIEU: LONG" ? "LONG" : "SHORT";
                         let giamua = convertFloatToFixed(arr[2]);
                         if (hopdong > botVolumeValue.val()) {
                             hopdong = botVolumeValue.val();

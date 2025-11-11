@@ -559,7 +559,7 @@ const tabExtContent = `
     <div style="border: 1px solid #ccc; border-radius: 4px; overflow: hidden; width: 100%;">
       <table id="bot-tbl-signals" style="width: 100%; border-collapse: collapse;">
           <thead style="background-color: #f0f0f0; font-weight: bold;">
-            <tr style="display: flex;">
+            <tr>
                 <th style="flex: 1; padding: 8px; text-align: left;">Ngày</th>
                 <th style="flex: 1; padding: 8px; text-align: center;">Thời gian</th>
                 <th style="flex: 1; padding: 8px; text-align: center;">Tín hiệu</th>
