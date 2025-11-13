@@ -1350,11 +1350,19 @@
 
 
 //const baseURL = "https://thtcalmm.id.vn/v1"
-const baseURL = "http://localhost:5131"
-const api_auth = `${baseURL}/api/auth`
-const api_signal = `${baseURL}/api/signal`
-const api_logHistory = `${baseURL}/api/logHistory`
-const api_profitLoss = `${baseURL}/api/profitLoss`
+// const baseURL = "http://localhost:5131"
+// const api_auth = `${baseURL}/api/auth`
+// const api_signal = `${baseURL}/api/signal`
+// const api_logHistory = `${baseURL}/api/logHistory`
+// const api_profitLoss = `${baseURL}/api/profitLoss`
+
+const baseURL = "/api/v1" 
+
+// CHÚ Ý SỬA CÁC DÒNG NÀY: Bỏ chữ /api/ đi vì nó đã có sẵn trong baseURL rồi
+const api_auth = `${baseURL}/auth`
+const api_signal = `${baseURL}/signal`
+const api_logHistory = `${baseURL}/logHistory`
+const api_profitLoss = `${baseURL}/profitLoss`
 
 const timezone7 = 7 * 60 * 60 * 1000; //ms
 
