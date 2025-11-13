@@ -4,8 +4,8 @@
     "short_name": "Autobot Phái Sinh",
     "version": "1.1",
     "description": "Công cụ hỗ trợ giao dịch tự động kết nối thuật toán đến các công ty chứng khoán (VPS, VNDirect, ...)",
-    "author": "autobotps.com",
-    "update_url": "https://autobotps.com/ext/updates.xml",
+    "author": "thtcalmm.id.vn",
+    "update_url": "https://thtcalmm.id.vn/ext/updates.xml",
     "permissions": [
         "declarativeNetRequestWithHostAccess",
         "webNavigation",

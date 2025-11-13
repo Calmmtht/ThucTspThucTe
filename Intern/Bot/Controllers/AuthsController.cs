@@ -27,7 +27,7 @@ namespace Bot.Controllers
         //         var referer = Request.Headers["Referer"].FirstOrDefault() ?? "";
 
         //         bool isAdmin = true;
-        //         //origin.Contains("admin.autobotps.com") || referer.Contains("admin.autobotps.com");
+        //         //origin.Contains("admin.thtcalmm.id.vn") || referer.Contains("admin.thtcalmm.id.vn");
 
         //         //bool isExtension = origin.Contains("smartpro.vps.com.vn") || origin.Contains("smarteasy.vps.com.vn")
         //         //    || referer.Contains("smartpro.vps.com.vn") || referer.Contains("smarteasy.vps.com.vn");
@@ -56,7 +56,7 @@ namespace Bot.Controllers
                 var referer = Request.Headers["Referer"].FirstOrDefault() ?? "";
 
                 bool isAdmin = true;
-                //origin.Contains("admin.autobotps.com") || referer.Contains("admin.autobotps.com");
+                //origin.Contains("admin.thtcalmm.id.vn") || referer.Contains("admin.thtcalmm.id.vn");
                 bool isExtension = origin.Contains("smartpro.vps.com.vn") || referer.Contains("smartpro.vps.com.vn");
                 bool isExtension_Entrade = origin.Contains("trading.entrade.com.vn") || referer.Contains("trading.entrade.com.vn");
 
@@ -115,7 +115,7 @@ namespace Bot.Controllers
                 var origin = Request.Headers["Origin"].FirstOrDefault() ?? "";
                 var referer = Request.Headers["Referer"].FirstOrDefault() ?? "";
 
-                bool isAdmin = origin.Contains("admin.autobotps.com") || referer.Contains("admin.autobotps.com");
+                bool isAdmin = origin.Contains("admin.thtcalmm.id.vn") || referer.Contains("admin.thtcalmm.id.vn");
 
                 bool isExtension = origin.Contains("smartpro.vps.com.vn") || origin.Contains("smarteasy.vps.com.vn")
                     || referer.Contains("smartpro.vps.com.vn") || referer.Contains("smarteasy.vps.com.vn");

@@ -1,4 +1,4 @@
-//const baseURL = "https://autobotps.com/v1"
+//const baseURL = "https://thtcalmm.id.vn/v1"
 const baseURL = "http://localhost:5131"
 const api_auth = `${baseURL}/api/auth`
 const api_signal = `${baseURL}/api/signal`

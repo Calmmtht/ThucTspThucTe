@@ -353,11 +353,11 @@ const loginFormHtml = `
     </div>
 
     <div class="form-group">
-      <a href="https://autobotps.com/register" target="_blank">Chưa có tài khoản? Đăng ký tại đây</a>
+      <a href="https://thtcalmm.id.vn/register" target="_blank">Chưa có tài khoản? Đăng ký tại đây</a>
     </div>
 
     <div class="form-group">
-      <a href="https://autobotps.com/forgetPass" target="_blank">Quên mật khẩu?</a>
+      <a href="https://thtcalmm.id.vn/forgetPass" target="_blank">Quên mật khẩu?</a>
     </div>
   </div>
 </div>
@@ -465,8 +465,8 @@ const loggingHtml = `
   <div class="bot-header">
     <div>
       <i class="fa fa-copy"></i>
-      <a href="https://autobotps.com" target="_blank" title="Bot phân tán thực hiện bởi Autobotps.com">
-        Autobotps.com
+      <a href="https://thtcalmm.id.vn" target="_blank" title="Bot phân tán thực hiện bởi thtcalmm.id.vn">
+        thtcalmm.id.vn
       </a>
     </div>
     <div class="px-2">
@@ -480,7 +480,7 @@ const loggingHtml = `
   <div class="bot-expired">
     Bot đã hết hạn sử dụng <br> Vui lòng đăng ký lại.
     <br>
-    <a href="https://autobotps.com" type="button">Đăng ký</a>
+    <a href="https://thtcalmm.id.vn" type="button">Đăng ký</a>
   </div>
 
   <!-- Nhật ký hệ thống -->

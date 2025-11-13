@@ -251,12 +251,12 @@ const loginFormHtml = `
                 <button id="cb_login" type="button" class="btn btn-primary">Đăng nhập</button>
             </div>
             <div class="form-group mb-1">
-                <a href="https://autobotps.com/register" target="_blank" title="Đăng ký tài khoản mới">
+                <a href="https://thtcalmm.id.vn/register" target="_blank" title="Đăng ký tài khoản mới">
                     Chưa có tài khoản? Đăng ký tại đây
                 </a>
             </div>
             <div class="form-group mb-1">
-                <a href="https://autobotps.com/forgetPass" target="_blank" title="Quên mật khẩu? Click vào đây">
+                <a href="https://thtcalmm.id.vn/forgetPass" target="_blank" title="Quên mật khẩu? Click vào đây">
                     Quên mật khẩu?
                 </a>
             </div>
@@ -268,8 +268,8 @@ const loggingHtml = `
              <div class="d-flex">
                  <div class="mr-auto d-flex align-items-center">
                      <i class="fa fa-copy"></i>
-                     <a href="https://autobotps.com" target="_blank" class="mx-2" title="Bot phân tán thực hiện bởi Autobotps.com">
-                        Autobotps.com
+                     <a href="https://thtcalmm.id.vn" target="_blank" class="mx-2" title="Bot phân tán thực hiện bởi thtcalmm.id.vn">
+                        thtcalmm.id.vn
                      </a>
                  </div>
                  <div class="px-2">
@@ -283,7 +283,7 @@ const loggingHtml = `
          <div class="d-none bot-expired alert alert-danger text-center">
              Bot đã hết hạn sử dụng <br> Vui lòng đăng ký lại.
              <br>
-             <a href="https://autobotps.com" type="button" class="btn btn-primary">Đăng ký</a>
+             <a href="https://thtcalmm.id.vn" type="button" class="btn btn-primary">Đăng ký</a>
          </div>
 
          <div class="text-left border-bottom d-flex">
