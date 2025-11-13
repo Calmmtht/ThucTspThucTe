@@ -292,12 +292,16 @@ function checkAndClosePosition() {
 
     $('#deal-list tbody tr').each(function () {
         const viThe = $(this).find('td[id*="position"]').text().trim();
-        const klMo = $(this).find('td[id*="quantity"]').text().trim();
+        const klMoText = $(this).find('td[id*="quantity"]').text().trim();
 
-        if (klMo === "Đóng") return;
+        if (klMoText === "Đóng" || klMoText === "") return;
 
-        if (viThe === "Mua") buy++;
-        else if (viThe === "Bán") sell++;
+        // 👉 lấy số đầu tiên trước dấu /
+        const klMo = Number(klMoText.split("/")[0].replace(/[^\d.-]/g, ""));
+        if (isNaN(klMo)) return;
+
+        if (viThe === "Mua") buy += klMo;
+        else if (viThe === "Bán") sell += klMo;
     });
 
     const soViThe = buy - sell;
@@ -803,173 +807,303 @@ window.addEventListener('load', async () => {
         const runBotNormal = (tinhieu, giadat, hopdong) => {
             console.log(`runBotNormal - isEntrade: ${isEntrade}, isDemoMode: ${isDemoMode}`);
             if (isEntrade && isDemoMode) {
-                const setReactInputValue = (input, value) => {
-                    const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-                    nativeSetter.call(input, value);
-                    input.dispatchEvent(new Event("input", { bubbles: true }));
-                };
+                try {
+                    const setReactInputValue = (input, value) => {
+                        const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+                        nativeSetter.call(input, value);
+                        input.dispatchEvent(new Event("input", { bubbles: true }));
+                    };
 
-                const priceInput = document.getElementById("order-price-inp");
-                const qtyInput = document.getElementById("order-quantity-inp");
+                    const priceInput = document.getElementById("order-price-inp");
+                    const qtyInput = document.getElementById("order-quantity-inp");
 
-                if (priceInput && qtyInput) {
+                    if (!priceInput || !qtyInput) {
+                        console.warn("⚠️ Không tìm thấy input giá hoặc số lượng, bỏ qua runBotNormal");
+                        add_logs("Không tìm thấy input giá hoặc số lượng, không thể đặt lệnh");
+                        return;
+                    }
+
+                    // set gia va so hop dong
                     setReactInputValue(priceInput, giadat);
                     setReactInputValue(qtyInput, hopdong);
-                }
 
-                add_logs(`Đã đặt lệnh ${tinhieu} giá ${giadat} với ${hopdong} hợp đồng`);
+                    add_logs(`Đã nhập giá ${giadat} và SL ${hopdong} cho lệnh ${tinhieu}`);
 
-                if (tinhieu === "LONG") {
-                    const btnBuy = document.getElementById("order-buy-btn");
-                    if (btnBuy) {
-                        btnBuy.click();
+                    // --- Xu ly nut mua ban ---
+                    if (tinhieu === "LONG") {
+                        const btnBuy = document.getElementById("order-buy-btn");
+                        if (btnBuy) {
+                            if (!btnBuy.disabled) {
+                                btnBuy.click();
+                                add_logs(`✅ Đã click nút MUA (${giadat} / ${hopdong})`);
+                            } else {
+                                console.warn("⚠️ Nút MUA bị vô hiệu (disabled)");
+                                add_logs("⚠️ Nút MUA bị disable, không thể click");
+                            }
+                        } else {
+                            console.warn("⚠️ Không tìm thấy nút MUA");
+                            add_logs("Không tìm thấy nút MUA để click");
+                        }
                     }
-                }
 
-                if (tinhieu === "SHORT") {
-                    const btnSell = document.getElementById("order-sell-btn");
-                    if (btnSell) {
-                        btnSell.click();
+                    if (tinhieu === "SHORT") {
+                        const btnSell = document.getElementById("order-sell-btn");
+                        if (btnSell) {
+                            if (!btnSell.disabled) {
+                                btnSell.click();
+                                add_logs(`✅ Đã click nút BÁN (${giadat} / ${hopdong})`);
+                            } else {
+                                console.warn("⚠️ Nút BÁN bị vô hiệu (disabled)");
+                                add_logs("⚠️ Nút BÁN bị disable, không thể click");
+                            }
+                        } else {
+                            console.warn("⚠️ Không tìm thấy nút BÁN");
+                            add_logs("Không tìm thấy nút BÁN để click");
+                        }
                     }
+
+                } catch (err) {
+                    console.error("❌ Lỗi trong runBotNormal:", err);
+                    add_logs("❌ Lỗi khi thực thi runBotNormal: " + err.message);
                 }
             }
         };
 
         //  -------------- CHAY TREN BANG DEMO --------------------
+        // const runBotStopOrder = async (tinhieu, hopdong, stopOrderValue) => {
+        //     console.log(`runBotStopOrder - isEntrade: ${isEntrade}, isDemoMode: ${isDemoMode}`);
+        //     if (isEntrade && isDemoMode) {
+        //         const setReactInputValue = (input, value) => {
+        //             const nativeSetter = Object.getOwnPropertyDescriptor(
+        //                 window.HTMLInputElement.prototype,
+        //                 "value"
+        //             ).set;
+        //             nativeSetter.call(input, value);
+        //             input.dispatchEvent(new Event("input", { bubbles: true }));
+        //         };
+
+        //         // Hàm đợi phần tử render xong
+        //         const waitForElement = async (selector, timeout = 5000) => {
+        //             const start = Date.now();
+        //             while (Date.now() - start < timeout) {
+        //                 const el = document.querySelector(selector);
+        //                 if (el) return el;
+        //                 await new Promise(r => setTimeout(r, 200));
+        //             }
+        //             return null;
+        //         };
+
+        //         try {
+        //             const btnDieuKien = document.getElementById("condition-order-button");
+        //             if (btnDieuKien) {
+        //                 btnDieuKien.click();
+        //             }
+        //             else {
+        //                 return;
+        //             }
+
+        //             const triggerPriceInp = await waitForElement("#trigger-price-inp", 7000);
+        //             if (!triggerPriceInp) {
+        //                 return;
+        //             }
+
+        //             setReactInputValue(triggerPriceInp, stopOrderValue);
+
+
+        //             if (tinhieu === "LONG") {
+        //                 const btnGreater = document.getElementById("condition-great-than-btn");
+        //                 if (btnGreater) {
+        //                     btnGreater.click();
+        //                 }
+        //             }
+        //             else {
+        //                 const btnLess = document.getElementById("condition-less-than-btn");
+        //                 if (btnLess) {
+        //                     btnLess.click();
+        //                 }
+        //             }
+
+        //             const targetPriceInp = await waitForElement("#target-price-inp", 3000);
+        //             if (targetPriceInp) {
+        //                 setReactInputValue(targetPriceInp, stopOrderValue);
+        //             }
+
+        //             const targetQtyInp = await waitForElement("#target-quantity-inp", 3000);
+        //             if (targetQtyInp) {
+        //                 setReactInputValue(targetQtyInp, hopdong);
+        //             }
+
+        //             await new Promise(r => setTimeout(r, 500));
+
+        //             if (tinhieu === "LONG") {
+        //                 const btnBuy = document.getElementById("order-buy-btn");
+        //                 if (btnBuy && !btnBuy.disabled) {
+        //                     btnBuy.click();
+        //                     add_logs(`Đã gửi lệnh MUA điều kiện (giá ${stopOrderValue}, SL ${hopdong})`);
+        //                 } else {
+        //                     add_logs("Nút MUA bị disable hoặc chưa sẵn sàng");
+        //                 }
+        //             }
+        //             else {
+        //                 const btnSell = document.getElementById("order-sell-btn");
+        //                 if (btnSell && !btnSell.disabled) {
+        //                     btnSell.click();
+        //                     add_logs(`Đã gửi lệnh BÁN điều kiện (giá ${stopOrderValue}, SL ${hopdong})`);
+        //                 } else {
+        //                     add_logs("Nút BÁN bị disable hoặc chưa sẵn sàng");
+        //                 }
+        //             }
+
+        //             const main = document.querySelector('main');
+        //             const div1 = main.querySelector('div');
+        //             const div2 = div1?.querySelectorAll('div')[0];
+        //             const div3 = div2?.querySelectorAll('div')[0];
+        //             const div4 = div3?.querySelector('div');
+        //             const div5 = div4?.querySelectorAll('div')[70];
+        //             const div6 = div5?.querySelectorAll('div')[0];
+
+        //             const btn = div6?.querySelector("button");
+        //             if (btn) {
+        //                 btn.click();
+        //             } else {
+        //                 add_logs("Khong tim thay nut dau tien trong div6");
+        //             }
+
+
+        //         } catch (err) {
+        //             console.error(err);
+        //             add_logs("Lỗi khi đặt lệnh điều kiện: " + err.message);
+        //         }
+        //     }
+        // };
+
         const runBotStopOrder = async (tinhieu, hopdong, stopOrderValue) => {
             console.log(`runBotStopOrder - isEntrade: ${isEntrade}, isDemoMode: ${isDemoMode}`);
-            if (isEntrade && isDemoMode) {
-                const setReactInputValue = (input, value) => {
-                    const nativeSetter = Object.getOwnPropertyDescriptor(
-                        window.HTMLInputElement.prototype,
-                        "value"
-                    ).set;
-                    nativeSetter.call(input, value);
-                    input.dispatchEvent(new Event("input", { bubbles: true }));
-                };
+            return new Promise(async (resolve, reject) => {
+                if (isEntrade && isDemoMode) {
+                    const setReactInputValue = (input, value) => {
+                        const nativeSetter = Object.getOwnPropertyDescriptor(
+                            window.HTMLInputElement.prototype,
+                            "value"
+                        ).set;
+                        nativeSetter.call(input, value);
+                        input.dispatchEvent(new Event("input", { bubbles: true }));
+                    };
 
-                // Hàm đợi phần tử render xong
-                const waitForElement = async (selector, timeout = 5000) => {
-                    const start = Date.now();
-                    while (Date.now() - start < timeout) {
-                        const el = document.querySelector(selector);
-                        if (el) return el;
-                        await new Promise(r => setTimeout(r, 200));
-                    }
-                    return null;
-                };
+                    const waitForElement = async (selector, timeout = 5000) => {
+                        const start = Date.now();
+                        while (Date.now() - start < timeout) {
+                            const el = document.querySelector(selector);
+                            if (el) return el;
+                            await new Promise(r => setTimeout(r, 200));
+                        }
+                        return null;
+                    };
 
-                try {
-                    const btnDieuKien = document.getElementById("condition-order-button");
-                    if (btnDieuKien) {
+                    try {
+                        const btnDieuKien = document.getElementById("condition-order-button");
+                        if (!btnDieuKien) {
+                            add_logs("Không tìm thấy nút điều kiện");
+                            return resolve(false);
+                        }
                         btnDieuKien.click();
-                    }
-                    else {
-                        return;
-                    }
 
-                    const triggerPriceInp = await waitForElement("#trigger-price-inp", 7000);
-                    if (!triggerPriceInp) {
-                        return;
-                    }
-
-                    setReactInputValue(triggerPriceInp, stopOrderValue);
-
-
-                    if (tinhieu === "LONG") {
-                        const btnGreater = document.getElementById("condition-great-than-btn");
-                        if (btnGreater) {
-                            btnGreater.click();
+                        const triggerPriceInp = await waitForElement("#trigger-price-inp", 7000);
+                        if (!triggerPriceInp) {
+                            add_logs("Không tìm thấy ô nhập giá kích hoạt");
+                            return resolve(false);
                         }
-                    }
-                    else {
-                        const btnLess = document.getElementById("condition-less-than-btn");
-                        if (btnLess) {
-                            btnLess.click();
-                        }
-                    }
 
-                    const targetPriceInp = await waitForElement("#target-price-inp", 3000);
-                    if (targetPriceInp) {
-                        setReactInputValue(targetPriceInp, stopOrderValue);
-                    }
+                        setReactInputValue(triggerPriceInp, stopOrderValue);
 
-                    const targetQtyInp = await waitForElement("#target-quantity-inp", 3000);
-                    if (targetQtyInp) {
-                        setReactInputValue(targetQtyInp, hopdong);
-                    }
-
-                    await new Promise(r => setTimeout(r, 500));
-
-                    if (tinhieu === "LONG") {
-                        const btnBuy = document.getElementById("order-buy-btn");
-                        if (btnBuy && !btnBuy.disabled) {
-                            btnBuy.click();
-                            add_logs(`Đã gửi lệnh MUA điều kiện (giá ${stopOrderValue}, SL ${hopdong})`);
+                        if (tinhieu === "LONG") {
+                            const btnGreater = document.getElementById("condition-great-than-btn");
+                            if (btnGreater) btnGreater.click();
                         } else {
-                            add_logs("Nút MUA bị disable hoặc chưa sẵn sàng");
+                            const btnLess = document.getElementById("condition-less-than-btn");
+                            if (btnLess) btnLess.click();
                         }
-                    }
-                    else {
-                        const btnSell = document.getElementById("order-sell-btn");
-                        if (btnSell && !btnSell.disabled) {
-                            btnSell.click();
-                            add_logs(`Đã gửi lệnh BÁN điều kiện (giá ${stopOrderValue}, SL ${hopdong})`);
+
+                        const targetPriceInp = await waitForElement("#target-price-inp", 3000);
+                        if (targetPriceInp) setReactInputValue(targetPriceInp, stopOrderValue);
+
+                        const targetQtyInp = await waitForElement("#target-quantity-inp", 3000);
+                        if (targetQtyInp) setReactInputValue(targetQtyInp, hopdong);
+
+                        await new Promise(r => setTimeout(r, 500));
+
+                        let clicked = false;
+                        if (tinhieu === "LONG") {
+                            const btnBuy = document.getElementById("order-buy-btn");
+                            if (btnBuy && !btnBuy.disabled) {
+                                btnBuy.click();
+                                clicked = true;
+                                add_logs(`Đã gửi lệnh MUA điều kiện (giá ${stopOrderValue}, SL ${hopdong})`);
+                            } else {
+                                add_logs("Nút MUA bị disable hoặc chưa sẵn sàng");
+                            }
                         } else {
-                            add_logs("Nút BÁN bị disable hoặc chưa sẵn sàng");
+                            const btnSell = document.getElementById("order-sell-btn");
+                            if (btnSell && !btnSell.disabled) {
+                                btnSell.click();
+                                clicked = true;
+                                add_logs(`Đã gửi lệnh BÁN điều kiện (giá ${stopOrderValue}, SL ${hopdong})`);
+                            } else {
+                                add_logs("Nút BÁN bị disable hoặc chưa sẵn sàng");
+                            }
                         }
+
+                        const main = document.querySelector('main');
+                        const div1 = main.querySelector('div');
+                        const div2 = div1?.querySelectorAll('div')[0];
+                        const div3 = div2?.querySelectorAll('div')[0];
+                        const div4 = div3?.querySelector('div');
+                        const div5 = div4?.querySelectorAll('div')[70];
+                        const div6 = div5?.querySelectorAll('div')[0];
+                        const btn = div6?.querySelector("button");
+
+                        if (btn) {
+                            btn.click();
+                            add_logs("Đã click nút xác nhận cuối cùng");
+                        } else {
+                            add_logs("Không tìm thấy nút xác nhận cuối cùng");
+                        }
+
+                        resolve(clicked);
+                    } catch (err) {
+                        console.error(err);
+                        add_logs("Lỗi khi đặt lệnh điều kiện: " + err.message);
+                        reject(err);
                     }
-
-                    const main = document.querySelector('main');
-                    const div1 = main.querySelector('div');
-                    const div2 = div1?.querySelectorAll('div')[0];
-                    const div3 = div2?.querySelectorAll('div')[0];
-                    const div4 = div3?.querySelector('div');
-                    const div5 = div4?.querySelectorAll('div')[70];
-                    const div6 = div5?.querySelectorAll('div')[0];
-
-                    const btn = div6?.querySelector("button");
-                    if (btn) {
-                        btn.click();
-                    } else {
-                        add_logs("Khong tim thay nut dau tien trong div6");
-                    }
-
-
-                } catch (err) {
-                    console.error(err);
-                    add_logs("Lỗi khi đặt lệnh điều kiện: " + err.message);
+                } else {
+                    resolve(false);
                 }
-            }
+            });
         };
+
 
         //  -------------- CHAY TREN BANG DEMO --------------------
         const huyLenhThuong = () => {
-            console.log(`huylenhthuong - isEntrade: ${isEntrade}, isDemoMode: ${isDemoMode}`);
             if (isEntrade && isDemoMode) {
-                const btnCancelAll = $("#order-cancel-all-btn");
-
-                if (btnCancelAll.length === 0) {
-                    console.warn("⚠️ Không tìm thấy nút 'Huỷ tất cả lệnh'");
-                    return;
+                const tabBtn = $("#order-book-tab-0");
+                if (tabBtn.length) {
+                    tabBtn.trigger("click");
+                } else {
+                    console.warn("⚠️ Không tìm thấy nút tab 'Sổ lệnh'");
                 }
-                $(".cancel-all-confirm").css("display", "none");
 
-                const checkActive = setInterval(() => {
-                    const isDisabled = btnCancelAll.prop("disabled") || btnCancelAll.hasClass("Mui-disabled");
-
-                    if (!isDisabled && btnCancelAll.is(":visible")) {
-                        clearInterval(checkActive);
-
+                const checkCancelBtn = setInterval(() => {
+                    const btnCancelAll = $("#order-cancel-all-btn");
+                    if (btnCancelAll.length) {
+                        clearInterval(checkCancelBtn);
                         btnCancelAll.trigger("click");
-
-                        $(".cancel-all-confirm").css("display", "");
-
-                        add_logs("Đã huỷ tất cả lệnh thường");
                     }
-                }, 300);
+                }, 400);
+
+                setTimeout(() => clearInterval(checkCancelBtn), 10000);
             }
         };
+
 
         //  -------------- CHAY TREN BANG DEMO --------------------
         const huyLenhDieuKien = () => {
@@ -990,7 +1124,7 @@ window.addEventListener('load', async () => {
                     }
                 }, 400);
 
-                setTimeout(() => clearInterval(checkCancelBtn), 10000);
+                setTimeout(() => clearInterval(checkCancelBtn), 5000);
             }
 
             add_logs("Đã hủy tất cả lệnh điều kiện chờ kích hoạt");
@@ -1072,19 +1206,25 @@ window.addEventListener('load', async () => {
 
                 $('#deal-list tbody tr').each(function () {
                     const viThe = $(this).find('td[id*="position"]').text().trim();
-                    const klMo = $(this).find('td[id*="quantity"]').text().trim();
+                    const klMoText = $(this).find('td[id*="quantity"]').text().trim();
 
-                    if (klMo === "Đóng") return;
+                    if (klMoText === "Đóng" || klMoText === "") return;
 
-                    if (viThe === "Mua") buy++;
-                    else if (viThe === "Bán") sell++;
+                    // 👉 lấy số đầu tiên trước dấu /
+                    const klMo = Number(klMoText.split("/")[0].replace(/[^\d.-]/g, ""));
+                    if (isNaN(klMo)) return;
+
+                    if (viThe === "Mua") buy += klMo;
+                    else if (viThe === "Bán") sell += klMo;
                 });
 
                 const soViThe = buy - sell;
+                console.log(`Buy: ${buy}, Sell: ${sell}, SoViThe: ${soViThe}`);
 
                 return { buy, sell, soViThe };
             }
         };
+
 
         const parseStrToFloat = (str) => parseFloat(str.replace(/,/g, ''))
 
@@ -1115,7 +1255,7 @@ window.addEventListener('load', async () => {
             );
 
             const isLong = tinhieu === "LONG";
-            let my_hd = fullHopdong;
+            let my_hd = fullHopdong; //----------------- ?
             const ngDat = parseInt(botVolumeValue.val());
             const soSucMuaBan = tinhieu === "LONG" ? sucMua : sucBan;
 
@@ -1126,6 +1266,10 @@ window.addEventListener('load', async () => {
             if (daoChieu) {
                 add_logs("Tín hiệu đảo chiều!");
                 console.log("🚀 DAO CHIEU duoc kich hoat");
+                //
+                huyLenhThuong();
+                huyLenhDieuKien();
+                add_logs("Huy lenh sau dao chieu");
 
                 if (botVolume.val() === "0") {
                     console.log("📊 Che do: FULL suc mua");
@@ -1221,9 +1365,9 @@ window.addEventListener('load', async () => {
                 }
 
                 console.log("📈 Sau DAO CHIEU -> my_hd:", my_hd, "fullHopdong:", fullHopdong);
-                huyLenhThuong();
-                huyLenhDieuKien();
-                add_logs("Huy lenh sau dao chieu");
+                // huyLenhThuong();
+                // huyLenhDieuKien();
+                // add_logs("Huy lenh sau dao chieu");
             }
             else {
                 console.log("🟢 KHONG DAO CHIEU");
@@ -1301,29 +1445,37 @@ window.addEventListener('load', async () => {
                 console.log("🚀 Bat dau dat lenh chinh voi:", { tinhieu, giamua, fullHopdong });
                 runBotNormal(tinhieu, giamua, fullHopdong);
 
+
                 const funcNangTP = () => {
-                    localStorage.removeItem("lastTP")
-                    logHistory(userId, tinhieu, giamua, giamua, fullHopdong, false)
-                    giabandau = giamua
+                    localStorage.removeItem("lastTP");
+                    logHistory(userId, tinhieu, giamua, giamua, fullHopdong, false);
+                    giabandau = giamua;
 
-                    //dao lenh
-                    const tinHieuDao = daoLenh(tinhieu)
+                    // Dao lenh
+                    const tinHieuDao = daoLenh(tinhieu);
 
-                    // runBotStopOrder(tinHieuDao, my_hd, catLo)
+                    (async () => {
+                        const daGuiLenh = await runBotStopOrder(tinHieuDao, my_hd, catLo);
 
-                    //Chot 50%
-                    if (order50[0] > 0) {
-                        console.log("Chot 50%")
-                        runBotNormal(tinHieuDao, tp1, order50[0])
-                    }
+                        if (daGuiLenh) {
+                            // Chot 50%
+                            if (order50[0] > 0) {
+                                console.log("Chot 50%", tinHieuDao, tp1, order50[0]);
+                                runBotNormal(tinHieuDao, tp1, order50[0]);
+                            }
 
-                    //Chot 25%
-                    if (order25[0] > 0) {
-                        console.log("Chot 25%")
-                        runBotNormal(tinHieuDao, tp2, order25[0])
-                    }
+                            // Chot 25%
+                            if (order25[0] > 0) {
+                                console.log("Chot 25%", tinHieuDao, tp2, order25[0]);
+                                setTimeout(() => {
+                                    runBotNormal(tinHieuDao, tp2, order25[0]);
+                                }, 1500);
+                            }
+                        } else {
+                            add_logs("Không gửi được lệnh Stop Order, bỏ qua chốt lời");
+                        }
+                    })();
 
-                    runBotStopOrder(tinHieuDao, my_hd, catLo)
 
                     const funcTheoDoiGiaKhopLenh = () => {
                         console.log("🚀 [funcTheoDoiGiaKhopLenh] Bat dau theo doi gia khop...");
@@ -1339,10 +1491,6 @@ window.addEventListener('load', async () => {
                                 setTimeout(funcTheoDoiGiaKhopLenh, 1000);
                                 return;
                             }
-
-                            console.log("✅ Node giá khớp tìm được:", nodeGiaKhop);
-                            console.log("✅ Giá khớp hiện tại:", nodeGiaKhop.innerText.trim());
-
                         } catch (err) {
                             console.error("❌ Lỗi khi tìm node giá khớp:", err);
                             setTimeout(funcTheoDoiGiaKhopLenh, 1000);
@@ -1392,6 +1540,7 @@ window.addEventListener('load', async () => {
                                         }));
                                         logHistory(userId, tinhieu, giamua, tp1, shdTP1, false);
                                         giabandau = tp1;
+                                        // if (order25[0] == 0) huyLenhDieuKien()
                                     }
 
 
@@ -1411,6 +1560,7 @@ window.addEventListener('load', async () => {
                                         }));
                                         logHistory(userId, tinhieu, tp1, tp2, shdTP2, false);
                                         giabandau = tp2;
+                                        // if (order25[1] == 0) huyLenhDieuKien()
                                     }
 
                                     // --- CAT LO ---
@@ -1421,6 +1571,16 @@ window.addEventListener('load', async () => {
                                     const tp1Condition = isShort
                                         ? giaKhopLenh >= giamua && dadatTp1 && !dadatTp2
                                         : giaKhopLenh <= giamua && dadatTp1 && !dadatTp2;
+
+                                    // console.log(":::cat-lo:::")
+                                    // console.log("isShort::", isShort)
+                                    // console.log("giaKhopLenh::", giaKhopLenh)
+                                    // console.log("catLo::", catLo)
+                                    // console.log("giaKhopLenh >= catLo && !dadatTp1 && !dadatTp2 ::", (giaKhopLenh >= catLo && !dadatTp1 && !dadatTp2))
+                                    // console.log("giaKhopLenh <= catLo && !dadatTp1 && !dadatTp2 ::", (giaKhopLenh <= catLo && !dadatTp1 && !dadatTp2))
+                                    // console.log("initCancelCondition::", initCancelCondition)
+                                    // console.log("daHuyInitCancel::", daHuyInitCancel)
+                                    // console.log(":::---:::")
 
                                     if (initCancelCondition && !daHuyInitCancel) {
                                         console.log("❌ Hủy lệnh do đạt cắt lỗ");
@@ -1440,111 +1600,265 @@ window.addEventListener('load', async () => {
                             }
                         });
 
-                    //     let giaKhopTruoc = null; // 💡 thêm biến nhớ giá trước
-
-                    //     const obsNangTP = new MutationObserver(mutationsList => {
-                    //         for (let mutation of mutationsList) {
-                    //             if (mutation.type === 'characterData' || mutation.type === 'childList') {
-                    //                 const textGia = nodeGiaKhop.textContent.trim();
-                    //                 const giaKhopLenh = parseStrToFloat(textGia);
-
-                    //                 if (isNaN(giaKhopLenh)) continue;
-
-                    //                 if (giaKhopTruoc === null) {
-                    //                     giaKhopTruoc = giaKhopLenh;
-                    //                     continue;
-                    //                 }
-
-                    //                 const isShort = tinhieu === "SHORT";
-
-                    //                 // --- PHÁT HIỆN GIÁ VƯỢT QUA MỐC TP ---
-                    //                 const daVuotTP1 = isShort
-                    //                     ? giaKhopTruoc > tp1 && giaKhopLenh <= tp1   // SHORT: giá giảm qua TP1
-                    //                     : giaKhopTruoc < tp1 && giaKhopLenh >= tp1;  // LONG: giá tăng qua TP1
-
-                    //                 const daVuotTP2 = isShort
-                    //                     ? giaKhopTruoc > tp2 && giaKhopLenh <= tp2
-                    //                     : giaKhopTruoc < tp2 && giaKhopLenh >= tp2;
-
-                    //                 const shdTP1 = my_hd - parseInt(order50[0]);
-                    //                 const shdTP2 = my_hd - parseInt(order50[0]) - parseInt(order25[0]);
-
-                    //                 // --- TP1 ---
-                    //                 if ((daVuotTP1 || (isShort ? giaKhopLenh <= tp1 : giaKhopLenh >= tp1))
-                    //                     && !dadatTp1 && shdTP1 > 0) {
-
-                    //                     console.log("🎯 Kích hoạt TP1 (vượt qua mốc)");
-                    //                     huyLenhDieuKien();
-                    //                     add_logs("Hủy lệnh sau khi chốt TP1");
-
-                    //                     const handler = () => runBotStopOrder(tinHieuDao, shdTP1, giamua);
-                    //                     (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
-
-                    //                     dadatTp1 = true;
-                    //                     localStorage.setItem("lastTP", JSON.stringify({
-                    //                         level: "TP1", time: new Date().toISOString(), price: tp1, contracts: shdTP1
-                    //                     }));
-                    //                     logHistory(userId, tinhieu, giamua, tp1, shdTP1, false);
-                    //                     giabandau = tp1;
-                    //                 }
-
-                    //                 // --- TP2 ---
-                    //                 if ((daVuotTP2 || (isShort ? giaKhopLenh <= tp2 : giaKhopLenh >= tp2))
-                    //                     && !dadatTp2 && shdTP2 > 0) {
-
-                    //                     console.log("🎯 Kích hoạt TP2 (vượt qua mốc)");
-                    //                     huyLenhDieuKien();
-                    //                     add_logs("Hủy lệnh sau khi chốt TP2");
-
-                    //                     const handler = () => runBotStopOrder(tinHieuDao, shdTP2, tp1);
-                    //                     (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
-
-                    //                     dadatTp1 = true;
-                    //                     dadatTp2 = true;
-                    //                     localStorage.setItem("lastTP", JSON.stringify({
-                    //                         level: "TP2", time: new Date().toISOString(), price: tp2, contracts: shdTP2
-                    //                     }));
-                    //                     logHistory(userId, tinhieu, tp1, tp2, shdTP2, false);
-                    //                     giabandau = tp2;
-                    //                 }
-
-                    //                 // --- CAT LO / QUAY VE TP1 ---
-                    //                 const initCancelCondition = isShort
-                    //                     ? giaKhopLenh >= catLo && !dadatTp1 && !dadatTp2
-                    //                     : giaKhopLenh <= catLo && !dadatTp1 && !dadatTp2;
-
-                    //                 const tp1Condition = isShort
-                    //                     ? giaKhopLenh >= giamua && dadatTp1 && !dadatTp2
-                    //                     : giaKhopLenh <= giamua && dadatTp1 && !dadatTp2;
-
-                    //                 if (initCancelCondition && !daHuyInitCancel) {
-                    //                     console.log("❌ Hủy lệnh do đạt cắt lỗ");
-                    //                     huyLenhThuong();
-                    //                     add_logs("Hủy lệnh sau khi cắt lỗ");
-                    //                     daHuyInitCancel = true;
-                    //                     logHistory(userId, tinhieu, giamua, catLo, my_hd, true);
-                    //                 } else if (tp1Condition && !daHuyTp1Cancel) {
-                    //                     console.log("❌ Hủy lệnh sau TP1 nhưng giá quay lại điểm vào");
-                    //                     huyLenhThuong();
-                    //                     add_logs("Hủy lệnh sau khi quay về TP1");
-                    //                     daHuyInitCancel = true;
-                    //                     daHuyTp1Cancel = true;
-                    //                     logHistory(userId, tinhieu, giamua, tp1, shdTP1, true);
-                    //                 }
-
-                    //                 giaKhopTruoc = giaKhopLenh; // 🔄 cập nhật giá trước
-                    //             }
-                    //         }
-                    //     });
-
-
-                        // bắt đầu theo dõi
                         obsNangTP.observe(nodeGiaKhop, { childList: true, characterData: true, subtree: true });
                         console.log("👀 Đang theo dõi thay đổi của node giá khớp:", nodeGiaKhop);
                     };
 
+                    // === Bat dau theo doi TP sau khi moi lenh da dat xong ===
+                    console.log("🚀 Bat dau funcTheoDoiGiaKhopLenh sau khi hoan tat dat lenh");
                     funcTheoDoiGiaKhopLenh();
-                }
+                };
+
+                // const funcNangTP = () => {
+                //     localStorage.removeItem("lastTP")
+                //     logHistory(userId, tinhieu, giamua, giamua, fullHopdong, false)
+                //     giabandau = giamua
+
+                //     //dao lenh
+                //     const tinHieuDao = daoLenh(tinhieu)
+
+                //     // runBotStopOrder(tinHieuDao, my_hd, catLo)
+
+                //     //Chot 50%
+                //     if (order50[0] > 0) {
+                //         console.log("Chot 50%", tinHieuDao, tp1, order50[0]);
+                //         runBotNormal(tinHieuDao, tp1, order50[0]);
+                //     }
+
+                //     if (order25[0] > 0) {
+                //         console.log("Chot 25%", tinHieuDao, tp2, order25[0]);
+                //         setTimeout(() => {
+                //             runBotNormal(tinHieuDao, tp2, order25[0]);
+                //         }, 1500);
+                //     }
+
+
+                //     setTimeout(() => {
+                //         runBotStopOrder(tinHieuDao, my_hd, catLo);
+                //     }, 4000);
+
+                //     const funcTheoDoiGiaKhopLenh = () => {
+                //         console.log("🚀 [funcTheoDoiGiaKhopLenh] Bat dau theo doi gia khop...");
+
+                //         let nodeGiaKhop = null;
+
+                //         try {
+                //             const main = document.querySelector('main');
+                //             nodeGiaKhop = main.querySelectorAll("p")[2];
+
+                //             if (!nodeGiaKhop) {
+                //                 console.warn("⚠️ Không tìm thấy node giá khớp, thu lai sau 1s...");
+                //                 setTimeout(funcTheoDoiGiaKhopLenh, 1000);
+                //                 return;
+                //             }
+
+                //             console.log("✅ Node giá khớp tìm được:", nodeGiaKhop);
+                //             console.log("✅ Giá khớp hiện tại:", nodeGiaKhop.innerText.trim());
+
+                //         } catch (err) {
+                //             console.error("❌ Lỗi khi tìm node giá khớp:", err);
+                //             setTimeout(funcTheoDoiGiaKhopLenh, 1000);
+                //             return;
+                //         }
+
+                //         // 🟢 Tạo observer theo dõi thay đổi giá
+                //         const obsNangTP = new MutationObserver(mutationsList => {
+                //             for (let mutation of mutationsList) {
+                //                 if (mutation.type === 'characterData' || mutation.type === 'childList') {
+                //                     const textGia = nodeGiaKhop.textContent.trim();
+                //                     const giaKhopLenh = parseStrToFloat(textGia);
+
+                //                     if (isNaN(giaKhopLenh)) {
+                //                         console.log("⚠️ Giá khớp không hợp lệ, bỏ qua...");
+                //                         continue;
+                //                     }
+
+                //                     console.log("💹 Giá khớp mới:", giaKhopLenh);
+
+                //                     // === PHẦN XỬ LÝ TP1, TP2, CAT LO ===
+                //                     const isShort = tinhieu === "SHORT";
+
+                //                     const condition1 = isShort
+                //                         ? giaKhopLenh <= tp1 && giaKhopLenh > tp2
+                //                         : giaKhopLenh >= tp1 && giaKhopLenh < tp2;
+
+                //                     const condition2 = isShort
+                //                         ? giaKhopLenh <= tp2
+                //                         : giaKhopLenh >= tp2;
+
+                //                     const shdTP1 = my_hd - parseInt(order50[0]);
+                //                     const shdTP2 = my_hd - parseInt(order50[0]) - parseInt(order25[0]);
+
+                //                     // --- TP1 ---
+                //                     if (condition1 && !dadatTp1 && shdTP1 > 0) {
+                //                         console.log("🎯 Kích hoạt TP1");
+                //                         huyLenhDieuKien();
+                //                         add_logs("Hủy lệnh sau khi chốt TP1");
+
+                //                         const handler = () => runBotStopOrder(tinHieuDao, shdTP1, giamua);
+                //                         (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
+
+                //                         dadatTp1 = true;
+                //                         localStorage.setItem("lastTP", JSON.stringify({
+                //                             level: "TP1", time: new Date().toISOString(), price: tp1, contracts: shdTP1
+                //                         }));
+                //                         logHistory(userId, tinhieu, giamua, tp1, shdTP1, false);
+                //                         giabandau = tp1;
+                //                         if (order25[0] == 0) huyLenhDieuKien()
+                //                     }
+
+
+                //                     // --- TP2 ---
+                //                     else if (condition2 && !dadatTp2 && shdTP2 > 0) {
+                //                         console.log("🎯 Kích hoạt TP2");
+                //                         huyLenhDieuKien();
+                //                         add_logs("Hủy lệnh sau khi chốt TP2");
+
+                //                         const handler = () => runBotStopOrder(tinHieuDao, shdTP2, tp1);
+                //                         (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
+
+                //                         dadatTp1 = true;
+                //                         dadatTp2 = true;
+                //                         localStorage.setItem("lastTP", JSON.stringify({
+                //                             level: "TP2", time: new Date().toISOString(), price: tp2, contracts: shdTP2
+                //                         }));
+                //                         logHistory(userId, tinhieu, tp1, tp2, shdTP2, false);
+                //                         giabandau = tp2;
+                //                         if (order25[1] == 0) huyLenhDieuKien()
+                //                     }
+
+                //                     // --- CAT LO ---
+                //                     const initCancelCondition = isShort
+                //                         ? giaKhopLenh >= catLo && !dadatTp1 && !dadatTp2
+                //                         : giaKhopLenh <= catLo && !dadatTp1 && !dadatTp2;
+
+                //                     const tp1Condition = isShort
+                //                         ? giaKhopLenh >= giamua && dadatTp1 && !dadatTp2
+                //                         : giaKhopLenh <= giamua && dadatTp1 && !dadatTp2;
+
+                //                     if (initCancelCondition && !daHuyInitCancel) {
+                //                         console.log("❌ Hủy lệnh do đạt cắt lỗ");
+                //                         huyLenhThuong();
+                //                         add_logs("Hủy lệnh sau khi cắt lỗ");
+                //                         daHuyInitCancel = true;
+                //                         logHistory(userId, tinhieu, giamua, catLo, my_hd, true);
+                //                     } else if (tp1Condition && !daHuyTp1Cancel) {
+                //                         console.log("❌ Hủy lệnh sau TP1 nhưng giá quay lại điểm vào");
+                //                         huyLenhThuong();
+                //                         add_logs("Hủy lệnh sau khi quay về TP1");
+                //                         daHuyInitCancel = true;
+                //                         daHuyTp1Cancel = true;
+                //                         logHistory(userId, tinhieu, giamua, tp1, shdTP1, true);
+                //                     }
+                //                 }
+                //             }
+                //         });
+
+                //         //     let giaKhopTruoc = null; // 💡 thêm biến nhớ giá trước
+
+                //         //     const obsNangTP = new MutationObserver(mutationsList => {
+                //         //         for (let mutation of mutationsList) {
+                //         //             if (mutation.type === 'characterData' || mutation.type === 'childList') {
+                //         //                 const textGia = nodeGiaKhop.textContent.trim();
+                //         //                 const giaKhopLenh = parseStrToFloat(textGia);
+
+                //         //                 if (isNaN(giaKhopLenh)) continue;
+
+                //         //                 if (giaKhopTruoc === null) {
+                //         //                     giaKhopTruoc = giaKhopLenh;
+                //         //                     continue;
+                //         //                 }
+
+                //         //                 const isShort = tinhieu === "SHORT";
+
+                //         //                 // --- PHÁT HIỆN GIÁ VƯỢT QUA MỐC TP ---
+                //         //                 const daVuotTP1 = isShort
+                //         //                     ? giaKhopTruoc > tp1 && giaKhopLenh <= tp1   // SHORT: giá giảm qua TP1
+                //         //                     : giaKhopTruoc < tp1 && giaKhopLenh >= tp1;  // LONG: giá tăng qua TP1
+
+                //         //                 const daVuotTP2 = isShort
+                //         //                     ? giaKhopTruoc > tp2 && giaKhopLenh <= tp2
+                //         //                     : giaKhopTruoc < tp2 && giaKhopLenh >= tp2;
+
+                //         //                 const shdTP1 = my_hd - parseInt(order50[0]);
+                //         //                 const shdTP2 = my_hd - parseInt(order50[0]) - parseInt(order25[0]);
+
+                //         //                 // --- TP1 ---
+                //         //                 if ((daVuotTP1 || (isShort ? giaKhopLenh <= tp1 : giaKhopLenh >= tp1))
+                //         //                     && !dadatTp1 && shdTP1 > 0) {
+
+                //         //                     console.log("🎯 Kích hoạt TP1 (vượt qua mốc)");
+                //         //                     huyLenhDieuKien();
+                //         //                     add_logs("Hủy lệnh sau khi chốt TP1");
+
+                //         //                     const handler = () => runBotStopOrder(tinHieuDao, shdTP1, giamua);
+                //         //                     (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
+
+                //         //                     dadatTp1 = true;
+                //         //                     localStorage.setItem("lastTP", JSON.stringify({
+                //         //                         level: "TP1", time: new Date().toISOString(), price: tp1, contracts: shdTP1
+                //         //                     }));
+                //         //                     logHistory(userId, tinhieu, giamua, tp1, shdTP1, false);
+                //         //                     giabandau = tp1;
+                //         //                 }
+
+                //         //                 // --- TP2 ---
+                //         //                 if ((daVuotTP2 || (isShort ? giaKhopLenh <= tp2 : giaKhopLenh >= tp2))
+                //         //                     && !dadatTp2 && shdTP2 > 0) {
+
+                //         //                     console.log("🎯 Kích hoạt TP2 (vượt qua mốc)");
+                //         //                     huyLenhDieuKien();
+                //         //                     add_logs("Hủy lệnh sau khi chốt TP2");
+
+                //         //                     const handler = () => runBotStopOrder(tinHieuDao, shdTP2, tp1);
+                //         //                     (isEntrade && isDemoMode) ? setTimeout(handler, 1000) : handler();
+
+                //         //                     dadatTp1 = true;
+                //         //                     dadatTp2 = true;
+                //         //                     localStorage.setItem("lastTP", JSON.stringify({
+                //         //                         level: "TP2", time: new Date().toISOString(), price: tp2, contracts: shdTP2
+                //         //                     }));
+                //         //                     logHistory(userId, tinhieu, tp1, tp2, shdTP2, false);
+                //         //                     giabandau = tp2;
+                //         //                 }
+
+                //         //                 // --- CAT LO / QUAY VE TP1 ---
+                //         //                 const initCancelCondition = isShort
+                //         //                     ? giaKhopLenh >= catLo && !dadatTp1 && !dadatTp2
+                //         //                     : giaKhopLenh <= catLo && !dadatTp1 && !dadatTp2;
+
+                //         //                 const tp1Condition = isShort
+                //         //                     ? giaKhopLenh >= giamua && dadatTp1 && !dadatTp2
+                //         //                     : giaKhopLenh <= giamua && dadatTp1 && !dadatTp2;
+
+                //         //                 if (initCancelCondition && !daHuyInitCancel) {
+                //         //                     console.log("❌ Hủy lệnh do đạt cắt lỗ");
+                //         //                     huyLenhThuong();
+                //         //                     add_logs("Hủy lệnh sau khi cắt lỗ");
+                //         //                     daHuyInitCancel = true;
+                //         //                     logHistory(userId, tinhieu, giamua, catLo, my_hd, true);
+                //         //                 } else if (tp1Condition && !daHuyTp1Cancel) {
+                //         //                     console.log("❌ Hủy lệnh sau TP1 nhưng giá quay lại điểm vào");
+                //         //                     huyLenhThuong();
+                //         //                     add_logs("Hủy lệnh sau khi quay về TP1");
+                //         //                     daHuyInitCancel = true;
+                //         //                     daHuyTp1Cancel = true;
+                //         //                     logHistory(userId, tinhieu, giamua, tp1, shdTP1, true);
+                //         //                 }
+
+                //         //                 giaKhopTruoc = giaKhopLenh; // 🔄 cập nhật giá trước
+                //         //             }
+                //         //         }
+                //         //     });
+
+
+                //         // bắt đầu theo dõi
+                //         obsNangTP.observe(nodeGiaKhop, { childList: true, characterData: true, subtree: true });
+                //         console.log("👀 Đang theo dõi thay đổi của node giá khớp:", nodeGiaKhop);
+                //     };
+
+                //     funcTheoDoiGiaKhopLenh();
+                // }
 
                 const funcTheoDoiTrangThaiDat = () => {
                     let lenhFullHd
