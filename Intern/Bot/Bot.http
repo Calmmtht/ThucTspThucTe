@@ -1,5 +1,5 @@
-@Bot_HostAddress = http://localhost:5131
-
+//@Bot_HostAddress = http://localhost:5131
+@Bot_HostAddress = https://thtcalmm.id.vn
 GET {{Bot_HostAddress}}/weatherforecast/
 Accept: application/json
 

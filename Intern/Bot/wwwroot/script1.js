@@ -5,7 +5,7 @@
 // const api_logHistory = `${baseURL}/api/logHistory`
 // const api_profitLoss = `${baseURL}/api/profitLoss`
 
-const baseURL = "/api/v1" 
+const baseURL = "/api" 
 
 // CHÚ Ý SỬA CÁC DÒNG NÀY: Bỏ chữ /api/ đi vì nó đã có sẵn trong baseURL rồi
 const api_auth = `${baseURL}/auth`

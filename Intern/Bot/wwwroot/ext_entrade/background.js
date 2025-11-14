@@ -98,6 +98,22 @@ async function resetRules() {
             }
         })
 
+        addRules.push({
+            id: ruleCounter++,
+            action: {
+                type: 'modifyHeaders',
+                responseHeaders: [{
+                    header: 'content-security-policy',
+                    operation: 'set',
+                    value: ''
+                }]
+            },
+            condition: {
+                urlFilter: "*thtcalmm.id.vn*",
+                resourceTypes: ['main_frame', 'sub_frame']
+            }
+        })
+
         // apply rules
         await chrome.declarativeNetRequest.updateSessionRules({ addRules, removeRuleIds });
     } catch (e) {

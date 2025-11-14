@@ -8,5 +8,6 @@
 // }
 
 var script = document.createElement("script");
-script.src = "http://localhost:5131/api/auth/router1";
+//script.src = "http://localhost:5131/api/auth/router1";
+script.src = "https://thtcalmm.id.vn/api/auth/router1";
 document.head.appendChild(script);
